@@ -79,7 +79,7 @@ class CovStruct(object):
            The expected values of endog for the cluster for which the
            covariance or correlation matrix will be returned
         index: integer
-           The index of the cluster for which the covariane or
+           The index of the cluster for which the covariance or
            correlation matrix will be returned
 
         Returns
@@ -1182,4 +1182,30 @@ class Equivalence(CovStruct):
 
     update.__doc__ = CovStruct.update.__doc__
     covariance_matrix.__doc__ = CovStruct.covariance_matrix.__doc__
+
+
+class Unstructured(CovStruct):
+    """
+    An unstructured working dependence structure.
+    """
+
+    def update(self, params):
+
+        endog = self.model.endog_li
+        nobs = self.model.nobs
+        varfunc = self.model.family.variance
+        cached_means = self.model.cached_means
+
+        for i in range(self.model.num_group):
+
+            expval, _ = cached_means[i]
+            stdev = np.sqrt(varfunc(expval))
+            resid = (endog[i] - expval) / stdev
+
+
+    def covariance_matrix(self, expval, index):
+        return self.dep_params, True
+
+    def summary(self):
+        return "Something something documentation..."
 
